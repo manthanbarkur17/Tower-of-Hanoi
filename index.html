@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tower of Hanoi</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="difficulty-selection">
+            <button class="difficulty neon-blue" onclick="startGame(3)">Easy (3 Disks)</button>
+            <button class="difficulty neon-pink" onclick="startGame(4)">Medium (4 Disks)</button>
+            <button class="difficulty neon-purple" onclick="startGame(6)">Hard (6 Disks)</button>
+        </div>
+        <div id="game" class="hidden">
+            <div class="move-counter">Moves: <span id="moveCount">0</span></div>
+            <div class="towers">
+                <div class="tower" id="tower1" onclick="selectTower(1)"></div>
+                <div class="tower" id="tower2" onclick="selectTower(2)"></div>
+                <div class="tower" id="tower3" onclick="selectTower(3)"></div>
+            </div>
+            <div id="retry" class="hidden">
+                <button class="retry-button" onclick="retryGame()">Retry</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

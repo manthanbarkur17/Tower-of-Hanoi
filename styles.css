@@ -1,0 +1,213 @@
+let moves = 0;
+let selectedDisk = null;
+let selectedTower = null;
+let numberOfDisks = 3;
+let moveHistory = [];
+
+function startGame(difficulty) {
+    numberOfDisks = difficulty;
+    moves = 0;
+    document.getElementById('moveCount').textContent = moves;
+    document.querySelector('.difficulty-selection').classList.add('hidden');
+    document.getElementById('game').classList.remove('hidden');
+    document.getElementById('retry').classList.add('hidden');
+    setupTowers();
+}
+
+function setupTowers() {
+    const tower1 = document.getElementById('tower1');
+    tower1.innerHTML = '';
+
+    moveHistory = []; // Clear move history on setup
+
+    for (let i = numberOfDisks; i > 0; i--) {
+        const disk = document.createElement('div');
+        disk.className = 'disk';
+        disk.dataset.size = i;
+        disk.style.bottom = `${(numberOfDisks - i) * 30}px`;
+        tower1.appendChild(disk);
+    }
+
+    document.getElementById('tower2').innerHTML = '';
+    document.getElementById('tower3').innerHTML = '';
+}
+
+function selectTower(towerId) {
+    const tower = document.getElementById(`tower${towerId}`);
+    const topDisk = tower.lastElementChild;
+
+    if (selectedDisk) {
+        if (!topDisk || topDisk.dataset.size > selectedDisk.dataset.size) {
+            moveDisk(selectedDisk, tower);
+            selectedDisk = null;
+            moves++;
+            document.getElementById('moveCount').textContent = moves;
+            moveHistory.push({ disk: selectedDisk, fromTower: selectedTower, toTower: towerId });
+            if (checkWin()) {
+                setTimeout(() => {
+                    alert('You won!');
+                    document.getElementById('retry').classList.remove('hidden');
+                }, 500);
+            }
+        } else {
+            alert('Invalid move!');
+        }
+    } else if (topDisk) {
+        selectedDisk = topDisk;
+        selectedTower = towerId;
+        selectedDisk.remove();
+    }
+}
+
+function moveDisk(disk, tower) {
+    tower.appendChild(disk);
+    adjustDiskPositions(tower);
+}
+
+function adjustDiskPositions(tower) {
+    const disks = Array.from(tower.children);
+    disks.forEach((disk, index) => {
+        disk.style.bottom = `${index * 30}px`;
+    });
+}
+
+function checkWin() {
+    return document.getElementById('tower3').childElementCount === numberOfDisks;
+}
+
+function retryGame() {
+    document.querySelector('.difficulty-selection').classList.remove('hidden');
+    document.getElementById('game').classList.add('hidden');
+    moves = 0;
+    document.getElementById('moveCount').textContent = moves;
+    moveHistory = [];
+    setupTowers();
+}
+
+function undoMove() {
+    if (moveHistory.length > 0) {
+        const lastMove = moveHistory.pop();
+        const { disk, fromTower, toTower } = lastMove;
+        const fromTowerElement = document.getElementById(`tower${toTower}`);
+        const toTowerElement = document.getElementById(`tower${fromTower}`);
+        
+        moveDisk(disk, fromTowerElement);
+        moves--;
+        document.getElementById('moveCount').textContent = moves;
+    }
+}
+body {
+    font-family: 'Courier New', Courier, monospace;
+    background: #121212; /* Dark background */
+    color: #fff; /* White text */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.game-container {
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+.difficulty-selection {
+    margin-bottom: 20px;
+}
+
+.difficulty {
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-size: 1em;
+    text-transform: uppercase;
+    border-radius: 5px;
+    outline: none;
+}
+
+.difficulty.neon-blue {
+    background: #03a9f4; /* Neon Blue */
+}
+
+.difficulty.neon-blue:hover {
+    background: #0288d1; /* Darker Neon Blue on hover */
+}
+
+.difficulty.neon-pink {
+    background: #e91e63; /* Neon Pink */
+}
+
+.difficulty.neon-pink:hover {
+    background: #c2185b; /* Darker Neon Pink on hover */
+}
+
+.difficulty.neon-purple {
+    background: #9c27b0; /* Neon Purple */
+}
+
+.difficulty.neon-purple:hover {
+    background: #7b1fa2; /* Darker Neon Purple on hover */
+}
+
+.move-counter {
+    margin: 20px;
+    font-size: 1.2em;
+}
+
+.towers {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.tower {
+    width: 100px;
+    height: 300px;
+    background: #333; /* Tower color in dark theme */
+    border-radius: 5px;
+    position: relative;
+    border: 2px solid #000;
+    margin: 0 10px;
+}
+
+.disk {
+    position: absolute;
+    height: 30px;
+    border-radius: 50%;
+    transition: all 0.5s;
+}
+
+.disk[data-size="1"] { width: 40px; background: #e57373; left: 30px; } /* Red */
+.disk[data-size="2"] { width: 60px; background: #f06292; left: 20px; } /* Pink */
+.disk[data-size="3"] { width: 80px; background: #ba68c8; left: 10px; } /* Purple */
+.disk[data-size="4"] { width: 100px; background: #9575cd; left: 0px; } /* Deep Purple */
+.disk[data-size="5"] { width: 120px; background: #7986cb; left: -10px; } /* Indigo */
+.disk[data-size="6"] { width: 140px; background: #64b5f6; left: -20px; } /* Blue */
+
+.retry-button {
+    background: #0ff;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: background 0.3s, box-shadow 0.3s;
+    border-radius: 5px;
+    font-size: 1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px #fff;
+    box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff;
+}
+
+.retry-button:hover {
+    background: #00f;
+    color: #fff;
+    box-shadow: 0 0 20px #00f, 0 0 40px #00f, 0 0 60px #00f;
+}
